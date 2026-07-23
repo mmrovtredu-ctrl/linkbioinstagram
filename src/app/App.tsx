@@ -9,6 +9,7 @@ import {
   Rocket,
   Cpu,
   Instagram,
+  Lock,
 } from "lucide-react";
 
 /* ═══════════════════════════════════════════════════════════════════════
@@ -28,6 +29,7 @@ interface LinkItem {
   href: string;
   icon: typeof Code2;
   cmd: string; // "comando" estilo terminal exibido no card
+  soon?: boolean; // true = em construção, cinza e não clicável
 }
 
 const LINKS: LinkItem[] = [
@@ -40,10 +42,11 @@ const LINKS: LinkItem[] = [
   },
   {
     title: "Curso Renda com Sites",
-    subtitle: "Aprenda a criar sites e faturar",
+    subtitle: "Em breve — estou preparando tudo",
     href: "https://renda-com-sites.vercel.app/",
     icon: GraduationCap,
-    cmd: "run curso.rendacomsites",
+    cmd: "status: building...",
+    soon: true,
   },
   {
     title: "Instagram",
@@ -378,94 +381,179 @@ export default function App() {
 
         {/* links principais */}
         <div style={{ width: "100%", display: "grid", gap: 14 }}>
-          {LINKS.map((link, i) => (
-            <motion.a
-              key={link.href}
-              href={link.href}
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 26 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.45 + i * 0.14, type: "spring", stiffness: 130, damping: 16 }}
-              whileHover={{ y: -4, scale: 1.015 }}
-              whileTap={{ scale: 0.98 }}
-              className="lb-card"
-              style={{
-                position: "relative",
-                display: "flex",
-                alignItems: "center",
-                gap: 14,
-                padding: "16px 16px",
-                borderRadius: 16,
-                textDecoration: "none",
-                color: "#e8fff4",
-                background:
-                  "linear-gradient(150deg, rgba(11,26,19,0.92), rgba(4,14,10,0.92))",
-                border: "1px solid rgba(37,201,121,0.28)",
-                overflow: "hidden",
-                boxShadow: "0 12px 30px -18px rgba(0,0,0,0.9)",
-              }}
-            >
-              <span aria-hidden className="lb-shine" />
-              <span
-                style={{
-                  flex: "0 0 auto",
-                  width: 48,
-                  height: 48,
-                  borderRadius: 12,
-                  display: "grid",
-                  placeItems: "center",
-                  background: "rgba(37,201,121,0.12)",
-                  border: "1px solid rgba(37,201,121,0.35)",
-                  boxShadow: "inset 0 0 18px rgba(37,201,121,0.18)",
-                }}
-              >
-                <link.icon size={24} color="#25c979" strokeWidth={2.2} />
-              </span>
+          {LINKS.map((link, i) => {
+            const soon = !!link.soon;
 
-              <span style={{ flex: 1, minWidth: 0 }}>
-                <span style={{ display: "block", fontWeight: 700, fontSize: 16, lineHeight: 1.2 }}>
-                  {link.title}
-                </span>
-                <span style={{ display: "block", fontSize: 13, color: "#8fc7ac", marginTop: 2 }}>
-                  {link.subtitle}
-                </span>
+            // conteúdo interno compartilhado entre link ativo e card "em construção"
+            const inner = (
+              <>
+                <span aria-hidden className={soon ? undefined : "lb-shine"} />
                 <span
                   style={{
-                    display: "inline-block",
-                    marginTop: 7,
-                    fontFamily: "'JetBrains Mono', ui-monospace, monospace",
-                    fontSize: 11,
-                    color: "#37e6ff",
-                    background: "rgba(55,230,255,0.08)",
-                    border: "1px solid rgba(55,230,255,0.2)",
-                    borderRadius: 6,
-                    padding: "2px 7px",
+                    flex: "0 0 auto",
+                    width: 48,
+                    height: 48,
+                    borderRadius: 12,
+                    display: "grid",
+                    placeItems: "center",
+                    background: soon ? "rgba(255,255,255,0.05)" : "rgba(37,201,121,0.12)",
+                    border: soon
+                      ? "1px solid rgba(255,255,255,0.12)"
+                      : "1px solid rgba(37,201,121,0.35)",
+                    boxShadow: soon ? "none" : "inset 0 0 18px rgba(37,201,121,0.18)",
                   }}
                 >
-                  $ {link.cmd}
+                  <link.icon size={24} color={soon ? "#8a8f98" : "#25c979"} strokeWidth={2.2} />
                 </span>
-              </span>
 
-              <motion.span
-                aria-hidden
-                initial={false}
-                whileHover={{ rotate: 0 }}
+                <span style={{ flex: 1, minWidth: 0 }}>
+                  <span
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      fontWeight: 700,
+                      fontSize: 16,
+                      lineHeight: 1.2,
+                      color: soon ? "#9aa0aa" : "#e8fff4",
+                    }}
+                  >
+                    {link.title}
+                    {soon && (
+                      <span
+                        style={{
+                          fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                          fontSize: 10,
+                          fontWeight: 700,
+                          letterSpacing: "0.05em",
+                          textTransform: "uppercase",
+                          color: "#f0c674",
+                          background: "rgba(240,198,116,0.12)",
+                          border: "1px solid rgba(240,198,116,0.35)",
+                          borderRadius: 6,
+                          padding: "2px 6px",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        🚧 Em construção
+                      </span>
+                    )}
+                  </span>
+                  <span
+                    style={{
+                      display: "block",
+                      fontSize: 13,
+                      color: soon ? "#6b7280" : "#8fc7ac",
+                      marginTop: 2,
+                    }}
+                  >
+                    {link.subtitle}
+                  </span>
+                  <span
+                    style={{
+                      display: "inline-block",
+                      marginTop: 7,
+                      fontFamily: "'JetBrains Mono', ui-monospace, monospace",
+                      fontSize: 11,
+                      color: soon ? "#7b8794" : "#37e6ff",
+                      background: soon ? "rgba(255,255,255,0.04)" : "rgba(55,230,255,0.08)",
+                      border: soon
+                        ? "1px solid rgba(255,255,255,0.1)"
+                        : "1px solid rgba(55,230,255,0.2)",
+                      borderRadius: 6,
+                      padding: "2px 7px",
+                    }}
+                  >
+                    $ {link.cmd}
+                  </span>
+                </span>
+
+                <span
+                  aria-hidden
+                  style={{
+                    flex: "0 0 auto",
+                    width: 34,
+                    height: 34,
+                    borderRadius: "50%",
+                    display: "grid",
+                    placeItems: "center",
+                    background: "rgba(255,255,255,0.04)",
+                    border: soon
+                      ? "1px solid rgba(255,255,255,0.12)"
+                      : "1px solid rgba(37,201,121,0.3)",
+                  }}
+                >
+                  {soon ? (
+                    <Lock size={16} color="#8a8f98" />
+                  ) : (
+                    <ArrowUpRight size={18} color="#25c979" />
+                  )}
+                </span>
+              </>
+            );
+
+            const baseStyle = {
+              position: "relative" as const,
+              display: "flex",
+              alignItems: "center",
+              gap: 14,
+              padding: "16px 16px",
+              borderRadius: 16,
+              textDecoration: "none",
+              overflow: "hidden",
+            };
+
+            // card em construção — NÃO clicável (div, sem href)
+            if (soon) {
+              return (
+                <motion.div
+                  key={link.title}
+                  initial={{ opacity: 0, y: 26 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.45 + i * 0.14, type: "spring", stiffness: 130, damping: 16 }}
+                  aria-disabled="true"
+                  style={{
+                    ...baseStyle,
+                    color: "#9aa0aa",
+                    background:
+                      "linear-gradient(150deg, rgba(24,26,30,0.9), rgba(14,15,18,0.9))",
+                    border: "1px solid rgba(255,255,255,0.09)",
+                    boxShadow: "0 12px 30px -20px rgba(0,0,0,0.9)",
+                    cursor: "not-allowed",
+                    opacity: 0.85,
+                  }}
+                >
+                  {inner}
+                </motion.div>
+              );
+            }
+
+            // link ativo
+            return (
+              <motion.a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                initial={{ opacity: 0, y: 26 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.45 + i * 0.14, type: "spring", stiffness: 130, damping: 16 }}
+                whileHover={{ y: -4, scale: 1.015 }}
+                whileTap={{ scale: 0.98 }}
+                className="lb-card"
                 style={{
-                  flex: "0 0 auto",
-                  width: 34,
-                  height: 34,
-                  borderRadius: "50%",
-                  display: "grid",
-                  placeItems: "center",
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(37,201,121,0.3)",
+                  ...baseStyle,
+                  color: "#e8fff4",
+                  background:
+                    "linear-gradient(150deg, rgba(11,26,19,0.92), rgba(4,14,10,0.92))",
+                  border: "1px solid rgba(37,201,121,0.28)",
+                  boxShadow: "0 12px 30px -18px rgba(0,0,0,0.9)",
                 }}
               >
-                <ArrowUpRight size={18} color="#25c979" />
-              </motion.span>
-            </motion.a>
-          ))}
+                {inner}
+              </motion.a>
+            );
+          })}
         </div>
 
         {/* rodapé stats fake tech + assinatura */}
